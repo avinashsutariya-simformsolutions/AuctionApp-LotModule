@@ -1,0 +1,13 @@
+﻿{
+  "Increment_1": "The range must be consecutive",
+  "Increment_2": "The lower value must be less than higher value",
+  "Increment_3": "The lower value for the first row must be zero",
+  "Increment_4": "The increment value cannot be zero",
+  "Increment_5": "The increment value cannot be null",
+  "Increment_6": "The lower value should be divisible by increment set for a given range and the increment set for the previous range",
+  "Increment_7": "The higher value must be divisible by the increment value",
+  "Increment_8": "The increment range cannot contain more than 5 decimal places",
+  "Increment_9": "After transformation the possible lower value of added increment range is not divisible by the increment value",
+  "Increment_10": "The number of rows cannot exceed 40",
+  "Increment_11": "The number of rows should be more than 0"
+}

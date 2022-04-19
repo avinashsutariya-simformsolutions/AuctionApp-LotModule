@@ -1,0 +1,163 @@
+﻿@model Demo.MedTech.DataModel.Request.PlaceBid
+
+<div class="col-md-auto border" id="bidFrm" style="padding:25px;">
+    @using (Html.BeginForm("Index", "Marketplace", FormMethod.Post, new { id = "frmBid" }))
+    {
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group row mb-2">
+            <label asp-for="AuctionId" class="col-sm-4 col-form-label">Auction</label>
+            <div class="col-sm-8">
+                <input asp-for="AuctionId" class="form-control place-bid lot-verify" value="501" />
+                <span asp-validation-for="AuctionId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row mb-2">
+            <label asp-for="LotId" class="col-sm-4 col-form-label">Lot</label>
+            <div class="col-sm-8">
+                <input asp-for="LotId" class="form-control place-bid lot-verify" value="501" />
+                <span asp-validation-for="LotId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row mb-2">
+            <label asp-for="PlatformCode" class="col-sm-4 col-form-label">Platform</label>
+            <div class="col-sm-8">
+                <input asp-for="PlatformCode" class="form-control place-bid" value="10" />
+                <span asp-validation-for="PlatformCode" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row mb-2">
+            <label asp-for="MarketplaceCode" class="col-sm-4 col-form-label">Marketplace</label>
+            <div class="col-sm-8">
+                <input asp-for="MarketplaceCode" class="form-control place-bid" value="10" />
+                <span asp-validation-for="MarketplaceCode" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row mb-2">
+            <label asp-for="BidderId" class="col-sm-4 col-form-label">Bidder</label>
+            <div class="col-sm-8">
+                <input asp-for="BidderId" class="form-control place-bid" value="User1" />
+                <span asp-validation-for="BidderId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row mb-2">
+            <label asp-for="Amount" class="col-sm-4 col-form-label"></label>
+            <div class="col-sm-8">
+                <input asp-for="Amount" class="form-control place-bid" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row mt-2">
+            <input type="button" value="Verify" id="btnVerify" style="margin: 0 6px;" class="btn btn-warning col-5" onclick="validateBid();">
+            <input type="submit" value="Submit" id="btnSubmit" class="btn btn-primary col-5" style="margin: 0 6px;" disabled>
+        </div>
+
+        <span id="idBidResponse" style="display:none"></span>
+    }
+</div>
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+
+<script>
+    let d, idBidResponse, btnSubmitBid;
+
+    $(d).ready(function () {
+        d = document;
+        idBidResponse = d.getElementById("idBidResponse");
+        btnSubmitBid = d.getElementById("btnSubmit");
+        $('form').submit(function () {
+        var serializedForm = $(this).serialize();
+            idBidResponse.innerHTML = "";
+            showLoader();
+
+        $.ajax({
+            url: '@Url.Action("Index")',
+            type: "POST",
+            data: serializedForm,
+            success: function (bidResponse) {
+                hideLoader();
+                show(idBidResponse);
+                if (bidResponse === "") {
+                    idBidResponse.innerHTML = "SignalR host not reachable.";
+                }
+                let data = JSON.parse(bidResponse);
+                if (data.ValidationResults != undefined && data.ValidationResults.length > 0) {
+                    idBidResponse.appendChild(responseValidation(data.ValidationResults));
+                    idBidResponse.className = "text-danger";
+                } else {
+                    if (data.bidderId) {
+                        idBidResponse.innerHTML = 'Bid placed successfully.';
+                        idBidResponse.className = "text-default";
+                        //Timer
+
+                        auctionTimer(data.endTime);
+
+                    let bidderIdInput = d.getElementById("BidderId");
+                    let bidFrmDiv = d.getElementById("bidFrm");
+                    if (data.bidderId.toLowerCase() == bidderIdInput.value.toLowerCase()) {
+                        bidFrmDiv.style.backgroundColor = "#e3f2df";
+                    } else {
+                        bidFrmDiv.style.backgroundColor = "#ffdfdf";
+                    }
+
+                        startHubGroup();
+                    }
+                    else {
+                        idBidResponse.innerHTML = "Service Unavailable.";
+                        idBidResponse.className = "text-danger";
+                    }
+                }
+            },
+            error: function (xhr) {
+                hideLoader();
+                idBidResponse.innerHTML = 'Service Unavailable.';
+                idBidResponse.className = "text-danger";
+                console.log('Request Status: ' + xhr.status + ' Status Text: ' + xhr.statusText + ' ' + xhr.responseText);
+            }
+        });
+        return false;
+        });
+    });
+
+    $('#frmBid').on('change', '.lot-verify', function() {
+        btnSubmitBid.setAttribute("disabled", "disabled");
+    });
+
+    function validateBid() {
+        let frmData = $('form#frmBid').serialize();
+        showLoader();
+        $.ajax({
+            url: '@Url.Action("VerifyBid")',
+            type: "POST",
+            data: frmData,
+            dataType: 'json',
+            success: function (response) {
+                hideLoader();
+                clear(idBidResponse);
+                show(idBidResponse);
+                if (response != undefined && response.isValid === false && response.validationResults.length > 0) {
+                    idBidResponse.appendChild(responseValidation(response.validationResults));
+                    idBidResponse.className = "text-danger";
+                    btnSubmitBid.setAttribute("disabled", "disabled");
+                } else {
+                    if (response.isValid) {
+                        idBidResponse.appendChild(responseValidation([{ description: "Lot details verified. Click submit to place bid." }]));
+                        idBidResponse.className = "text-success";
+                        btnSubmitBid.removeAttribute("disabled");
+                    }
+                    else {
+                        idBidResponse.innerHTML = response.message ?? response.Message;
+                        idBidResponse.className = "text-danger";
+                    }
+                }
+            },
+            error: function (xhr) {
+                hideLoader();
+                idBidResponse.appendChild(responseValidation([{ description: "Service Unavailable." }]));
+                idBidResponse.className = "text-danger";
+                btnSubmitBid.setAttribute("disabled", "disabled");
+                console.log('Request Status: ' + xhr.status + ' Status Text: ' + xhr.statusText + ' ' + xhr.responseText);
+            }
+        });
+    }
+
+</script>
