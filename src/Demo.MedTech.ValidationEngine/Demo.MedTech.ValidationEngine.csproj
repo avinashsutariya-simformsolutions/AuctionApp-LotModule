@@ -5,47 +5,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Version>1.0.35</Version>
-    <Description>
-		This nuget package validates and transforms lot details as defined within SBS. There's a option to pass in auction detail as well for validation and transformation.
-
-		This nuget package provides same results as the transformation and validation api which is located at
-		'v1/validateandtransformlotdetail' and 'v1/validateandtransformauctiondetail'
-
-		Mark all json files imported with this nuget as "Copy always".
-
-		// Sample code
-		try
-		{
-		var requestJson = "{\"AtgAuctionId\":1,\"AtgLotId\":48,\"BiddingType\":0,\"OpeningPrice\":35,\"ReservePrice\":100,\"BuyItNow\":null,\"Currency\":\"GBP\",\"IncrementType\":\"auction\",\"Increment\":[{\"Low\":0,\"High\":50.01,\"IncrementValue\":0.01},{\"Low\":50.01,\"High\":100,\"IncrementValue\":0.01},{\"Low\":100,\"High\":500,\"IncrementValue\":25},{\"Low\":500,\"High\":1000,\"IncrementValue\":50},{\"Low\":1000,\"High\":5000,\"IncrementValue\":100},{\"Low\":5000,\"High\":null,\"IncrementValue\":100}],\"Quantity\":5,\"IsPiecemeal\":false,\"StartTime\":\"2021-08-11T00:00:00\",\"EndsFrom\":\"2022-08-30T00:00:00\",\"TimeZone\":\"UTC\",\"ExtensionTimeInSeconds\":600,\"BiddingSuspended\":false,\"AtgAuctionHouseId\":1,\"ReserveType\":\"Standard\"}";
-
-		// If constructor throws error related to RuleEngineException and ArgumentNullException.
-		AuctioneerContext auctioneerContext = new AuctioneerContext(requestJson);
-
-		// Evaluate LotModel against all Platform rules. If any rule fails exception handled by evaluate method itself
-		RuleValidationMessage ruleValidationMessage = auctioneerContext.Evaluate();
-
-		if (ruleValidationMessage.IsValid)
-		{
-		// Success
-		}
-		else
-		{
-		var errors = ruleValidationMessage.ValidationResults;
-		}
-		}
-		catch (RuleEngineException ex)
-		{
-		// Exceptions related to 'mandatory data' and 'data type mismatch' are caught here.
-		}
-		catch (ArgumentNullException ex)
-		{
-		// When request is found to be null, the exception will be caught here.
-		}
-		catch (Exception ex)
-		{
-		// Common exceptions
-		}
-	</Description>
+    <Description></Description>
   </PropertyGroup>
 
   <ItemGroup>

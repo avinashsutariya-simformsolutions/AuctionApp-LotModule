@@ -11,6 +11,5 @@
     <None Remove="Egress\**" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="ATGMedia.GAPShared.SBS.DataModel.xml" />
   </ItemGroup>
 </Project>

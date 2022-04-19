@@ -89,7 +89,6 @@ namespace Demo.MedTech.ValidationEngine.Model
         /// <summary>
         /// Extension method to evaluate validation rules
         /// </summary>
-        /// <returns><see cref="T:ATGMedia.GAPShared.SBS.CoreBidding.Contracts.Shared.RuleValidationMessage" /> </returns>
         public async Task<RuleValidationMessage> EvaluateAsync()
         {
             _ruleValidationMessage = new RuleValidationMessage { IsValid = true };
