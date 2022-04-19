@@ -34,54 +34,7 @@ namespace Playground.Controllers
         {
             return View();
         }
-
-        [HttpPost]
-        public ActionResult Index(PlaceBid bid)
-        {
-            var request = new RestRequest(Method.POST);
-
-            request.AddHeader("Content-Type", "application/json");
-            request.AddParameter("application/json", JsonSerializer.Serialize(bid), ParameterType.RequestBody);
-
-            IRestResponse response = _restClientApiCall.Execute(request, _configuration["CORE_BIDDING_API"] + _configuration["PLACE_BID_ENDPOINT"]);
-
-            JsonSerializerOptions options = new JsonSerializerOptions
-            {
-                Converters = { new JsonStringEnumConverter() },
-                PropertyNameCaseInsensitive = true
-            };
-            
-            var bidResponse = JsonSerializer.Deserialize<BidMinimumAndStandardResponse>(response.Content, options);
-
-            if (bidResponse?.IsValid == true)
-            {
-                // send message to service bus for sbs egress
-                var lastBiddingStates = bidResponse.BiddingStates?.LastOrDefault()?.State;
-
-                dynamic result = new ExpandoObject();
-                result.timeStamp = bidResponse.TimeStamp.ToString(CultureInfo.InvariantCulture);
-                result.bidderId = lastBiddingStates?.BidderId;
-
-                return Ok(JsonSerializer.Serialize(result));
-            }
-            else
-            {
-                return Ok(JsonSerializer.Serialize(new { bidResponse.TimeStamp, bidResponse.ValidationResults }));
-            }
-        }
-
-        [HttpPost]
-        public ActionResult VerifyBid(PlaceBid bid)
-        {
-            var request = new RestRequest(Method.POST);
-            request.AddHeader("Content-Type", "application/json");
-            request.AddParameter("application/json", JsonSerializer.Serialize(bid), ParameterType.RequestBody);
-
-            IRestResponse response = _restClientApiCall.Execute(request, _configuration["CORE_BIDDING_API"] + _configuration["VERIFY_BID_ENDPOINT"]);
-
-            return Ok(response.Content);
-        }
-
+        
         [HttpPost]
         public ActionResult LotDetails(long auctionId, long lotId)
         {
